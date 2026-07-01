@@ -128,6 +128,12 @@ on:
         required: false
         type: boolean
 
+      isponsorblock:
+        description: "Integrate iSponsorBlock"
+        default: true
+        required: false
+        type: boolean
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -195,7 +201,7 @@ jobs:
 
       - name: Cache Theos
         id: cache-theos
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: theos
           key: 18.6-SDK-${{ env.THEOS_COMMIT }}
@@ -209,6 +215,8 @@ jobs:
             git sparse-checkout set --no-cone iPhoneOS18.6.sdk
             git checkout --quiet
             mv *.sdk "$THEOS/sdks"
+            cd ${{ github.workspace }}/theos/vendor/logos
+            git checkout a62370066a97e36d59b200a9fa10c5091f5e8972
             
       - name: Clone headers
         run: |
@@ -243,7 +251,7 @@ jobs:
            chmod +x /usr/local/bin/tbd
 
       - name: Checkout YouMod
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: YouMod
 
@@ -335,6 +343,10 @@ jobs:
       - name: Clone VolumeBoostYT
         if: ${{ inputs.volboost }}
         run: git clone --quiet --depth=1 https://github.com/VasirakCalgux/VolumeBoostYT.git
+
+      - name: Clone iSponsorBlock
+        if: ${{ inputs.isponsorblock }}
+        run: git clone --quiet --depth=1 https://github.com/Galactic-Dev/iSponsorBlock.git
 
 
       - name: Clone and build YTPlaybackFix
@@ -490,6 +502,13 @@ jobs:
           cd VolumeBoostYT
           make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless ARCHS=arm64
           mv packages/*.deb ${{ github.workspace }}/volboostyt.deb
+
+      - name: Build iSponsorBlock
+        if: ${{ inputs.isponsorblock }}
+        run: |
+          cd iSponsorBlock
+          make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless TARGET=iphone:clang:latest:13.0
+          mv packages/*.deb ${{ github.workspace }}/isponsorblock.deb
           
       - name: Inject Tweaks Into IPA
         run: |
