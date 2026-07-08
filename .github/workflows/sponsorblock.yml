@@ -357,7 +357,7 @@ jobs:
 
       - name: Clone and build YouFixPlaybackIssues
         run: |
-            git clone --quiet --depth=1 https://github.com/Jaavvn/Youtube-playback-fix-by-AppropriateNet2928eNet2928Fix YouFixPlaybackIssues
+            git clone --quiet --depth=1 https://github.com/Jaavvn/Youtube-playback-fix-by-AppropriateNet2928 YouFixPlaybackIssues
             cd YouFixPlaybackIssues && make clean package DEBUG=0 FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
             mv packages/*.deb ${{ github.workspace }}/youfixplaybackissues.deb
 
